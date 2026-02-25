@@ -64,3 +64,66 @@
 - [ ] **Modélisation (JPA) :** Créer l'entité `MLModel` pour mapper les modèles Python en base de données.
 - [ ] **Repository :** Utiliser Spring Data JPA pour les opérations CRUD (Create, Read, Update, Delete).
 - [ ] **Interface :** Initier la partie React pour afficher les données du Back-end.
+
+
+# Projet : Engineering Portfolio - Phase 2 (Data & Full-Stack)
+
+> **Objectif :** Transformer le squelette Spring Boot en un système complet de gestion de projets, capable de stocker des données réelles et de les servir à un front-end React moderne.
+
+---
+
+## Architecture & Persistance des Données
+
+### 1. Modélisation Générique (JPA Entity)
+Au-delà du simple ML, l'entité `MLModel` a été étendue pour devenir une structure de gestion de projet polyvalente :
+* **Champs Clés :** `name`, `category`, `techStack`, `status`, `description`, `achievement`.
+* **Énumération :** Utilisation de `ProjectStatus` (`PLANNED`, `IN_PROGRESS`, `COMPLETED`) pour une gestion rigoureuse du cycle de vie des projets.
+
+### 2. Initialisation de la Base de Données
+* **Data Loader :** Mise en place d'un `CommandLineRunner` pour peupler automatiquement PostgreSQL avec 10 projets réels (NLP, Jeux, Recherche, Digital Twin) dès le démarrage de l'application.
+
+---
+
+## Points Clés d'Apprentissage (Q&A)
+
+### Communication Inter-Services
+**Q : Pourquoi mon front-end (React) ne pouvait-il pas lire les données du back-end au début ?**
+* **CORS (Cross-Origin Resource Sharing) :** Pour des raisons de sécurité, les navigateurs bloquent les requêtes entre des ports différents (8080 vs 5174).
+* **Solution :** Ajout de l'annotation `@CrossOrigin` sur le Controller Spring Boot pour autoriser explicitement le port du front-end.
+
+### Design & Expérience Utilisateur
+**Q : Comment Tailwind CSS a-t-il été configuré pour le projet ?**
+* **Configuration :** Installation des dépendances et initialisation du fichier `tailwind.config.js` pour scanner les fichiers `.jsx`.
+* **Layout :** Utilisation d'un système de grille responsive (`grid-cols-1 md:grid-cols-3`) pour assurer une consultation fluide sur mobile et desktop.
+
+### Résolution de Problèmes (Debugging)
+**Q : Que faire si le port 8080 est déjà utilisé ?**
+* **Action :** Il faut identifier le PID du processus Java précédent et le terminer via le terminal pour libérer le port 8080.
+
+---
+
+## État de l'Interface (Dashboard)
+
+| Composant UI | Fonctionnalité | Source de Données |
+| :--- | :--- | :--- |
+| **Header Statistics** | Project Summary (Total, Completed, In Progress) | Backend `repository.count()` |
+| **Project Cards** | Detailed Display (with icons and descriptions) | Backend API `/api/models` |
+| **Status Badges** | Dynamic Status Label (Terminé, En cours) | Backend Enum `ProjectStatus` |
+
+---
+
+## Commandes de la Semaine
+
+| Action | Commande |
+| :--- | :--- |
+| **Installer Tailwind** | `npm install -D tailwindcss postcss autoprefixer` |
+| **Initialiser la configuration** | `npx tailwindcss init -p` |
+| **Lancer l'interface utilisateur** | `npm run dev` |
+| **Git nettoyage forcé** | `git rm -rf --cached .` |
+
+---
+
+## Prochaines Étapes
+- [ ] **Filtrage Dynamique :** Ajoutez un champ de recherche pour permettre le filtrage des projets par pile technologique.
+- [ ] **Optimisation des interactions :** Implémentez « Framer Motion » pour ajouter des animations d'entrée aux cartes.
+- [ ] **Conteneurisation :** Affinez la configuration Docker pour permettre le déploiement en un clic du frontend et du backend.
