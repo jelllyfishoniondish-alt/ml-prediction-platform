@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Engineering Portfolio Preview</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg-main: #f4f7fb;
+        --bg-panel: rgba(255, 255, 255, 0.86);
+        --bg-card: #ffffff;
+        --border: rgba(148, 163, 184, 0.18);
+        --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.08);
+        --shadow-card: 0 14px 38px rgba(15, 23, 42, 0.08);
+        --text-main: #182338;
+        --text-muted: #52627c;
+        --accent: #2854e8;
+        --accent-soft: rgba(40, 84, 232, 0.08);
+        --completed-bg: #dcfce7;
+        --completed-text: #15803d;
+        --progress-bg: #dbeafe;
+        --progress-text: #1d4ed8;
+        --planned-bg: #fef3c7;
+        --planned-text: #b45309;
+        --danger-bg: #fff1f2;
+        --danger-text: #be123c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text-main);
+        background:
+          radial-gradient(circle at top left, rgba(40, 84, 232, 0.1), transparent 26%),
+          radial-gradient(circle at right 12%, rgba(13, 148, 136, 0.08), transparent 24%),
+          linear-gradient(180deg, #f7faff 0%, #edf3fb 100%);
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .page-shell {
+        min-height: 100vh;
+        padding: 32px 20px 48px;
+      }
+
+      .hero-panel,
+      .editor-panel,
+      .dashboard-panel {
+        backdrop-filter: blur(14px);
+      }
+
+      .hero-panel {
+        max-width: 1320px;
+        margin: 0 auto 24px;
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(244, 248, 255, 0.84));
+        box-shadow: var(--shadow-soft);
+        display: grid;
+        gap: 20px;
+        grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+      }
+
+      .eyebrow,
+      .panel-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .title {
+        margin: 14px 0 12px;
+        font-size: clamp(2.4rem, 4vw, 4.6rem);
+        line-height: 0.96;
+      }
+
+      .subtitle {
+        max-width: 760px;
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+
+      .hero-highlight {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        padding: 20px;
+        border-radius: 22px;
+        background: rgba(18, 52, 168, 0.05);
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        color: var(--accent);
+      }
+
+      .hero-highlight div {
+        display: grid;
+        gap: 6px;
+      }
+
+      .hero-highlight span {
+        color: #37517e;
+        line-height: 1.6;
+      }
+
+      .workspace {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+      }
+
+      .editor-panel,
+      .dashboard-panel {
+        padding: 28px;
+        border-radius: 28px;
+        border: 1px solid var(--border);
+        background: var(--bg-panel);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .panel-heading,
+      .toolbar,
+      .summary-row,
+      .card-topline,
+      .card-actions,
+      .form-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .panel-heading h2 {
+        margin: 10px 0 0;
+        font-size: 1.55rem;
+      }
+
+      .project-form {
+        margin-top: 22px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .project-form label {
+        display: grid;
+        gap: 8px;
+        color: var(--text-main);
+        font-size: 0.94rem;
+        font-weight: 600;
+      }
+
+      .project-form input,
+      .project-form textarea,
+      .project-form select,
+      .search-box input,
+      .select-box select {
+        width: 100%;
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.94);
+        padding: 14px 16px;
+        color: var(--text-main);
+      }
+
+      .project-form textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .primary-button,
+      .ghost-button,
+      .danger-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-weight: 700;
+      }
+
+      .primary-button {
+        color: white;
+        background: linear-gradient(135deg, #2752e7, #1b78f2);
+        box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+      }
+
+      .ghost-button {
+        color: var(--accent);
+        background: rgba(40, 84, 232, 0.08);
+      }
+
+      .danger-button {
+        color: var(--danger-text);
+        background: var(--danger-bg);
+      }
+
+      .dashboard-panel {
+        display: grid;
+        gap: 18px;
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+      }
+
+      .search-box,
+      .select-box,
+      .summary-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .search-box,
+      .select-box {
+        flex: 1 1 260px;
+        padding: 0 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        color: var(--text-muted);
+      }
+
+      .search-box input,
+      .select-box select {
+        padding-left: 0;
+        padding-right: 0;
+        border: 0;
+        background: transparent;
+      }
+
+      .summary-row {
+        flex-wrap: wrap;
+      }
+
+      .summary-note {
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .summary-note strong {
+        color: var(--text-main);
+      }
+
+      .stats-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .stat-card,
+      .project-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 24px;
+        box-shadow: var(--shadow-card);
+      }
+
+      .stat-card {
+        padding: 22px;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent);
+      }
+
+      .stat-label {
+        margin-top: 8px;
+        color: #6d7d97;
+        font-size: 0.84rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .feedback-banner {
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: var(--text-muted);
+      }
+
+      .project-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .project-card {
+        padding: 22px;
+      }
+
+      .card-topline {
+        align-items: flex-start;
+      }
+
+      .card-category {
+        color: var(--text-muted);
+        font-size: 0.84rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .project-card h3 {
+        margin: 16px 0 12px;
+        font-size: 1.35rem;
+        line-height: 1.25;
+      }
+
+      .description {
+        margin: 0 0 18px;
+        color: var(--text-muted);
+        line-height: 1.72;
+      }
+
+      .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tech,
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 700;
+      }
+
+      .tech {
+        padding: 7px 10px;
+        background: rgba(37, 99, 235, 0.08);
+        color: var(--accent);
+      }
+
+      .badge {
+        padding: 7px 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .completed {
+        background: var(--completed-bg);
+        color: var(--completed-text);
+      }
+
+      .in_progress {
+        background: var(--progress-bg);
+        color: var(--progress-text);
+      }
+
+      .planned {
+        background: var(--planned-bg);
+        color: var(--planned-text);
+      }
+
+      .result {
+        margin: 18px 0 20px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--accent);
+      }
+
+      .card-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 1180px) {
+        .hero-panel,
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page-shell {
+          padding: 16px 14px 32px;
+        }
+
+        .hero-panel,
+        .editor-panel,
+        .dashboard-panel {
+          padding: 22px 18px;
+          border-radius: 24px;
+        }
+
+        .panel-heading,
+        .toolbar,
+        .summary-row,
+        .card-topline,
+        .card-actions,
+        .form-actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <section class="hero-panel">
+        <div>
+          <span class="eyebrow">Preview Mode</span>
+          <h1 class="title">Project Control Center</h1>
+          <p class="subtitle">
+            这是不依赖 Java、PostgreSQL 和前端构建工具的可视化预览版本。你现在看到的交互，已经对齐到这次要补进正式项目里的方向：状态修正、搜索筛选和 CRUD。
+          </p>
+        </div>
+
+        <div class="hero-highlight">
+          <div>
+            <strong>状态已修正</strong>
+            <span>
+              Full-Stack Project Management Platform 和 Digital Twin Network Modeling
+              都已经调整为 completed。
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <aside class="editor-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="panel-kicker">Preview CRUD</span>
+              <h2 id="form-title">Add Project</h2>
+            </div>
+            <button type="button" class="ghost-button" id="cancel-edit">Cancel Edit</button>
+          </div>
+
+          <form class="project-form" id="project-form">
+            <label>
+              Project Name
+              <input name="name" placeholder="Ex: Distributed Task Orchestrator" required />
+            </label>
+
+            <label>
+              Category
+              <input name="category" placeholder="System Design Project" />
+            </label>
+
+            <label>
+              Tech Stack
+              <input name="techStack" placeholder="Java, gRPC, Redis, Docker" />
+            </label>
+
+            <label>
+              Status
+              <select name="status">
+                <option value="PLANNED">Planned</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+              </select>
+            </label>
+
+            <label>
+              Description
+              <textarea name="description" rows="4" placeholder="Project summary"></textarea>
+            </label>
+
+            <label>
+              Highlight
+              <input name="achievement" placeholder="Deployment Phase" />
+            </label>
+
+            <div class="form-actions">
+              <button type="submit" class="primary-button" id="submit-button">Create Project</button>
+              <button type="button" class="ghost-button" id="reset-form">Reset</button>
+            </div>
+          </form>
+        </aside>
+
+        <div class="dashboard-panel">
+          <div class="toolbar">
+            <label class="search-box">
+              <span>Search</span>
+              <input id="search-input" placeholder="Search by name, stack, category, or achievement" />
+            </label>
+
+            <label class="select-box">
+              <span>Status</span>
+              <select id="status-filter">
+                <option value="ALL">All Statuses</option>
+                <option value="PLANNED">Planned</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-note" id="summary-note"></div>
+            <div class="feedback-banner">Preview data updates instantly in this page.</div>
+          </div>
+
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="project-grid" id="project-grid"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const seedProjects = [
+        {
+          id: 1,
+          name: "Box Office Forecast",
+          category: "Machine Learning",
+          techStack: "Python, NLP, BERT",
+          status: "COMPLETED",
+          description:
+            "Undergraduate Thesis: Analyzing Genre Film Reviews and Predicting Box Office Performance Using NLP Technology.",
+          achievement: "R² = 0.868",
+        },
+        {
+          id: 2,
+          name: "Spider Solitaire",
+          category: "Software Dev",
+          techStack: "Python, Pygame",
+          status: "COMPLETED",
+          description:
+            "Built a Spider Solitaire game engine in Python, focusing on rule enforcement, state management, and algorithmic correctness.",
+          achievement: "Logic Verified",
+        },
+        {
+          id: 3,
+          name: "Restaurant SQL Modeling",
+          category: "Database Design",
+          techStack: "MySQL, Relational Algebra",
+          status: "COMPLETED",
+          description:
+            "Design and optimize the database architecture for the restaurant management system.",
+          achievement: "Schema Optimized",
+        },
+        {
+          id: 4,
+          name: "Petri Net Concurrency Modeling",
+          category: "Academic Research",
+          techStack: "Python, Petri Net, Discrete Event Simulation",
+          status: "COMPLETED",
+          description:
+            "Built a Petri Net-based simulation framework to analyze concurrency, resource contention, and system state transitions.",
+          achievement: "Simulation Phase",
+        },
+        {
+          id: 5,
+          name: "Customer Credit Risk Segmentation",
+          category: "Kaggle Competition",
+          techStack: "Python, Pandas, Scikit-learn, K-Means, PCA",
+          status: "COMPLETED",
+          description:
+            "Built a full analytical pipeline including preprocessing, feature transformation, clustering optimization, and performance validation to identify actionable credit risk segments.",
+          achievement: "Deployment Phase",
+        },
+        {
+          id: 6,
+          name: "Behavior-Driven Academic Performance Prediction",
+          category: "Machine Learning",
+          techStack: "Python, Pandas, Scikit-learn, XGBoost, Stacking Ensemble",
+          status: "COMPLETED",
+          description:
+            "Engineered behavioral features and implemented ensemble learning models including XGBoost and stacking; optimized predictive performance using cross-validation and RMSE-based evaluation.",
+          achievement: "Optimization Phase",
+        },
+        {
+          id: 7,
+          name: "Full-Stack Project Management Platform",
+          category: "Full-Stack Dev",
+          techStack: "React, Spring Boot, Docker",
+          status: "COMPLETED",
+          description:
+            "Built and completed a full-stack project management platform that connects a Spring Boot API, PostgreSQL persistence, and a React dashboard.",
+          achievement: "Production Flow Completed",
+        },
+        {
+          id: 8,
+          name: "Digital Twin Network Modeling",
+          category: "Academic Research",
+          techStack: "FastAPI, Kafka, NetworkX",
+          status: "COMPLETED",
+          description:
+            "Completed a Digital Twin Network model for topology representation, traffic simulation, and network-performance optimization.",
+          achievement: "Modeling Workflow Completed",
+        },
+        {
+          id: 9,
+          name: "Distributed Task Orchestrator",
+          category: "System Design Project",
+          techStack: "Java, gRPC, Docker, Redis",
+          status: "PLANNED",
+          description:
+            "Designing a fault-tolerant distributed task scheduling system with leader election, job coordination, and scalable worker nodes.",
+          achievement: "Architecture Phase",
+        },
+        {
+          id: 10,
+          name: "Parallel Graph Processing Engine",
+          category: "High Performance Computing",
+          techStack: "C++, OpenMP, MPI",
+          status: "PLANNED",
+          description:
+            "Planning a parallel graph processing framework to optimize large-scale network traversal and computation performance.",
+          achievement: "Performance Optimization Phase",
+        },
+      ];
+
+      const state = {
+        projects: [...seedProjects],
+        editingId: null,
+        nextId: 11,
+      };
+
+      const form = document.getElementById("project-form");
+      const summaryNote = document.getElementById("summary-note");
+      const statsGrid = document.getElementById("stats-grid");
+      const projectGrid = document.getElementById("project-grid");
+      const searchInput = document.getElementById("search-input");
+      const statusFilter = document.getElementById("status-filter");
+      const formTitle = document.getElementById("form-title");
+      const submitButton = document.getElementById("submit-button");
+      const cancelEdit = document.getElementById("cancel-edit");
+      const resetFormButton = document.getElementById("reset-form");
+
+      function formatStatus(status) {
+        return status
+          .toLowerCase()
+          .split("_")
+          .map((part) => part[0].toUpperCase() + part.slice(1))
+          .join(" ");
+      }
+
+      function resetForm() {
+        form.reset();
+        form.status.value = "PLANNED";
+        state.editingId = null;
+        formTitle.textContent = "Add Project";
+        submitButton.textContent = "Create Project";
+      }
+
+      function getFilteredProjects() {
+        const query = searchInput.value.trim().toLowerCase();
+        const status = statusFilter.value;
+
+        return state.projects.filter((project) => {
+          const matchesStatus = status === "ALL" || project.status === status;
+          if (!matchesStatus) {
+            return false;
+          }
+
+          if (!query) {
+            return true;
+          }
+
+          return [
+            project.name,
+            project.category,
+            project.techStack,
+            project.description,
+            project.achievement,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(query);
+        });
+      }
+
+      function renderStats(projects) {
+        const stats = [
+          { label: "Visible Projects", value: projects.length },
+          { label: "Completed", value: projects.filter((item) => item.status === "COMPLETED").length },
+          { label: "In Progress", value: projects.filter((item) => item.status === "IN_PROGRESS").length },
+          { label: "Planned", value: projects.filter((item) => item.status === "PLANNED").length },
+        ];
+
+        statsGrid.innerHTML = stats
+          .map(
+            (stat) => `
+              <article class="stat-card">
+                <div class="stat-number">${stat.value}</div>
+                <div class="stat-label">${stat.label}</div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderProjects(projects) {
+        if (!projects.length) {
+          projectGrid.innerHTML = '<div class="feedback-banner">No projects match the current search and filter combination.</div>';
+          return;
+        }
+
+        projectGrid.innerHTML = projects
+          .map(
+            (project) => `
+              <article class="project-card">
+                <div class="card-topline">
+                  <span class="card-category">${project.category || "Uncategorized"}</span>
+                  <span class="badge ${project.status.toLowerCase()}">${formatStatus(project.status)}</span>
+                </div>
+                <h3>${project.name}</h3>
+                <p class="description">${project.description || ""}</p>
+                <div class="tech-list">
+                  ${(project.techStack || "")
+                    .split(",")
+                    .map((tech) => tech.trim())
+                    .filter(Boolean)
+                    .map((tech) => `<span class="tech">${tech}</span>`)
+                    .join("")}
+                </div>
+                <div class="result">${project.achievement || ""}</div>
+                <div class="card-actions">
+                  <button type="button" class="ghost-button" data-action="edit" data-id="${project.id}">Edit</button>
+                  <button type="button" class="danger-button" data-action="delete" data-id="${project.id}">Delete</button>
+                </div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function render() {
+        const filteredProjects = getFilteredProjects();
+        summaryNote.innerHTML = `Showing <strong>${filteredProjects.length}</strong> of <strong>${state.projects.length}</strong> projects`;
+        renderStats(filteredProjects);
+        renderProjects(filteredProjects);
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const payload = {
+          name: form.name.value.trim(),
+          category: form.category.value.trim(),
+          techStack: form.techStack.value.trim(),
+          status: form.status.value,
+          description: form.description.value.trim(),
+          achievement: form.achievement.value.trim(),
+        };
+
+        if (state.editingId) {
+          state.projects = state.projects.map((project) =>
+            project.id === state.editingId ? { ...project, ...payload } : project
+          );
+        } else {
+          state.projects.unshift({ id: state.nextId++, ...payload });
+        }
+
+        resetForm();
+        render();
+      });
+
+      projectGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) {
+          return;
+        }
+
+        const projectId = Number(button.dataset.id);
+        const action = button.dataset.action;
+        const project = state.projects.find((item) => item.id === projectId);
+        if (!project) {
+          return;
+        }
+
+        if (action === "edit") {
+          state.editingId = projectId;
+          formTitle.textContent = "Update Project";
+          submitButton.textContent = "Save Changes";
+          form.name.value = project.name || "";
+          form.category.value = project.category || "";
+          form.techStack.value = project.techStack || "";
+          form.status.value = project.status || "PLANNED";
+          form.description.value = project.description || "";
+          form.achievement.value = project.achievement || "";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        if (action === "delete") {
+          state.projects = state.projects.filter((item) => item.id !== projectId);
+          if (state.editingId === projectId) {
+            resetForm();
+          }
+          render();
+        }
+      });
+
+      searchInput.addEventListener("input", render);
+      statusFilter.addEventListener("change", render);
+      cancelEdit.addEventListener("click", resetForm);
+      resetFormButton.addEventListener("click", resetForm);
+
+      resetForm();
+      render();
+    </script>
+  </body>
+</html>
