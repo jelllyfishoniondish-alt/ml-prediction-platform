@@ -127,3 +127,85 @@ Au-delà du simple ML, l'entité `MLModel` a été étendue pour devenir une str
 - [ ] **Filtrage Dynamique :** Ajoutez un champ de recherche pour permettre le filtrage des projets par pile technologique.
 - [ ] **Optimisation des interactions :** Implémentez « Framer Motion » pour ajouter des animations d'entrée aux cartes.
 - [ ] **Conteneurisation :** Affinez la configuration Docker pour permettre le déploiement en un clic du frontend et du backend.
+
+
+# Projet : Engineering Portfolio - Phase 3 (CRUD, UX & Déploiement)
+
+> **Objectif :** Faire évoluer le portfolio d'une simple interface de consultation vers un tableau de bord interactif capable de rechercher, filtrer, modifier et déployer les projets de manière plus professionnelle.
+
+---
+
+## Fonctionnalités Réalisées
+
+### 1. Mise à Jour du Cycle de Vie des Projets
+* **Correction des Statuts :** Les projets `Full-Stack Project Management Platform` et `Digital Twin Network Modeling` sont désormais considérés comme `COMPLETED`.
+* **Synchronisation Intelligente :** Le `DataInitializer` ne se contente plus d'insérer des données au premier lancement ; il resynchronise les projets par nom afin de corriger automatiquement les statuts et les descriptions existants dans la base.
+
+### 2. Passage à un Vrai Dashboard CRUD
+* **Back-end :** Ajout des endpoints REST complets `GET`, `POST`, `PUT` et `DELETE` pour gérer les projets depuis l'interface.
+* **Front-end :** Transformation de la page React en centre de contrôle interactif avec formulaire d'ajout, édition en place et suppression de projets.
+
+### 3. Expérience Utilisateur & Recherche
+* **Recherche Dynamique :** Le tableau de bord peut maintenant filtrer les projets par nom, catégorie, stack technique, description et résultat.
+* **Filtrage par Statut :** Un sélecteur permet d'afficher uniquement les projets `PLANNED`, `IN_PROGRESS` ou `COMPLETED`.
+* **Animations UI :** Intégration de `Framer Motion` pour améliorer l'apparition des panneaux, des statistiques et des cartes.
+
+### 4. Conteneurisation Plus Complète
+* **Back-end :** Ajout d'un `Dockerfile` pour packager l'application Spring Boot.
+* **Front-end :** Ajout d'un `Dockerfile` multi-stage avec `nginx` pour servir le build React.
+* **Orchestration :** Extension de `docker-compose.yml` pour piloter PostgreSQL, le back-end et le front-end ensemble.
+
+---
+
+## Points Clés d'Apprentissage (Q&A)
+
+### Synchronisation des Données
+**Q : Pourquoi le `CommandLineRunner` a-t-il été modifié pour synchroniser les projets au lieu d'insérer les données une seule fois ?**
+* **Problème Réel :** Une base déjà initialisée conservait d'anciens statuts (`IN_PROGRESS`) même après la mise à jour de la logique métier.
+* **Solution :** Recherche des projets par `name`, puis mise à jour des champs existants avant `save()`.
+* **Bénéfice :** Les données de démonstration restent cohérentes avec l'état réel du portfolio au fil du temps.
+
+### Architecture Front-End
+**Q : Pourquoi utiliser un chemin API relatif (`/api`) au lieu d'une URL codée en dur ?**
+* **Développement :** Le proxy Vite peut rediriger proprement les requêtes vers Spring Boot.
+* **Déploiement :** `nginx` peut exposer le front-end et relayer les appels API sans changer le code React.
+* **Maintenabilité :** Le front-end devient moins dépendant d'un port fixe comme `localhost:8080`.
+
+### Déploiement
+**Q : Quel est l'intérêt d'avoir des `Dockerfile` séparés pour le front-end et le back-end ?**
+* **Responsabilité Claire :** Chaque service a sa propre image, son propre cycle de build et sa propre configuration.
+* **Scalabilité :** Le front-end et le back-end peuvent être reconstruits ou remplacés indépendamment.
+* **Professionnalisation :** Cette approche se rapproche d'une vraie architecture de déploiement multi-services.
+
+---
+
+## État du Dashboard (Version Interactive)
+
+| Composant UI | Fonctionnalité | Source / Logique |
+| :--- | :--- | :--- |
+| **Search Bar** | Recherche textuelle multi-champs | Filtrage React sur `name`, `category`, `techStack`, `description`, `achievement` |
+| **Status Filter** | Filtrage par état d'avancement | Enum `ProjectStatus` |
+| **CRUD Form** | Création et modification de projets | API REST `POST /api/models`, `PUT /api/models/{id}` |
+| **Delete Action** | Suppression d'un projet | API REST `DELETE /api/models/{id}` |
+| **Animated Cards** | Apparition fluide du contenu | `Framer Motion` |
+| **Deployment Stack** | Front + Back + DB orchestrés | `docker-compose.yml` + `Dockerfile` + `nginx.conf` |
+
+---
+
+## Commandes Utiles (Phase 3)
+
+| Action | Commande |
+| :--- | :--- |
+| **Lancer le preview local** | `python3 -m http.server 4173 --bind 127.0.0.1` |
+| **Construire le back-end avec Docker** | `docker build -t ml-backend ./backend` |
+| **Construire le front-end avec Docker** | `docker build -t ml-frontend ./frontend` |
+| **Lancer toute la stack** | `docker-compose up --build` |
+| **Pousser les changements** | `git push origin main` |
+
+---
+
+## Prochaines Étapes
+- [ ] **Validation Serveur :** Ajouter une validation plus stricte côté Spring Boot pour empêcher les projets incomplets ou invalides.
+- [ ] **Base de Données de Prod :** Prévoir une configuration d'environnement distincte pour le développement et le déploiement.
+- [ ] **Tests Automatisés :** Couvrir les endpoints CRUD et les interactions critiques du dashboard.
+- [ ] **Authentification :** Réintroduire une sécurité plus réaliste une fois l'expérience CRUD stabilisée.
